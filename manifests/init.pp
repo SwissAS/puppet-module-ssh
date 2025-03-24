@@ -128,7 +128,7 @@ class ssh (
   $sshd_config_include                        = 'USE_DEFAULTS',
 ) {
 
-  case $::osfamily {
+  case $facts['os']['family'] {
     'RedHat': {
       $default_packages                        = ['openssh-server',
                                                   'openssh-clients']
@@ -468,7 +468,7 @@ class ssh (
       }
     }
     default: {
-      fail("ssh supports osfamilies RedHat, Suse, Debian and Solaris. Detected osfamily is <${::osfamily}>.")
+      fail("ssh supports osfamilies RedHat, Suse, Debian and Solaris. Detected osfamily is <${facts['os']['family']}>.")
     }
   }
 
@@ -1248,7 +1248,7 @@ class ssh (
   }
 
   if $sshd_addressfamily_real != undef {
-    if $::osfamily == 'Solaris' {
+    if $facts['os']['family'] == 'Solaris' {
       fail("ssh::sshd_addressfamily is not supported on Solaris and is set to <${sshd_addressfamily}>.")
     } else {
       validate_re($sshd_addressfamily_real, '^(any|inet|inet6)$',
