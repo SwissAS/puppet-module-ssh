@@ -1194,12 +1194,12 @@ class ssh (
   }
 
   # If either IPv4 or IPv6 stack is not configured on the agent, the
-  # corresponding $::ipaddress(6)? fact is not present. So, we cannot assume
+  # corresponding $facts['networking']['ip'](6)? fact is not present. So, we cannot assume
   # these variables are defined. Getvar (Stdlib 4.13+, ruby 1.8.7+) handles
   # this correctly.
-  if getvar('::ipaddress') and getvar('::ipaddress6') { $host_aliases = [$facts['networking']['hostname'], $::ipaddress, $::ipaddress6] }
-  elsif getvar('::ipaddress6') { $host_aliases = [$facts['networking']['hostname'], $::ipaddress6] }
-  else { $host_aliases = [$facts['networking']['hostname'], $::ipaddress] }
+  if getvar('::ipaddress') and getvar('::ipaddress6') { $host_aliases = [$facts['networking']['hostname'], $facts['networking']['ip'], $facts['networking']['ip6']] }
+  elsif getvar('::ipaddress6') { $host_aliases = [$facts['networking']['hostname'], $facts['networking']['ip6']] }
+  else { $host_aliases = [$facts['networking']['hostname'], $facts['networking']['ip']] }
 
   # export each node's ssh key
   if $ssh_key_export {
