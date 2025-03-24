@@ -212,7 +212,7 @@ class ssh (
                                                   'openssh-client']
       $default_service_name                    = 'ssh'
 
-      case $::operatingsystemrelease {
+      case $facts['os']['release']['full'] {
         '16.04': {
           $default_sshd_config_hostkey = [
             '/etc/ssh/ssh_host_rsa_key',
