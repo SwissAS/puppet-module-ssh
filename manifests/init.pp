@@ -149,7 +149,7 @@ class ssh (
       $default_sshd_gssapicleanupcredentials   = 'yes'
       $default_sshd_acceptenv                  = true
       $default_service_hasstatus               = true
-      if versioncmp($::operatingsystemrelease, '7.4') < 0 {
+      if versioncmp($facts['os']['release']['full'], '7.4') < 0 {
         $default_sshd_config_serverkeybits = '1024'
       } else {
         $default_sshd_config_serverkeybits = undef
@@ -409,7 +409,7 @@ class ssh (
           $default_service_hasstatus               = true
           $default_sshd_config_include             = undef
         }
-        default: { fail ("Operating System : ${::operatingsystemrelease} not supported") }
+        default: { fail ("Operating System : ${facts['os']['release']['full']} not supported") }
       }
     }
     'Solaris': {
