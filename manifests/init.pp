@@ -185,8 +185,8 @@ class ssh (
       $default_sshd_config_include             = undef
       case $facts['os']['architecture'] {
         'x86_64': {
-          if ($::operatingsystem == 'SLES') {
-            case $::operatingsystemrelease {
+          if ($facts['os']['name'] == 'SLES') {
+            case $facts['os']['release']['full'] {
               /15\./: {
                 $default_sshd_config_subsystem_sftp = '/usr/lib/ssh/sftp-server'
                 $default_sshd_config_serverkeybits  = undef
