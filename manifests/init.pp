@@ -183,7 +183,7 @@ class ssh (
       $default_sshd_config_tcp_keepalive       = 'yes'
       $default_sshd_config_permittunnel        = 'no'
       $default_sshd_config_include             = undef
-      case $::architecture {
+      case $facts['os']['architecture'] {
         'x86_64': {
           if ($::operatingsystem == 'SLES') {
             case $::operatingsystemrelease {
@@ -202,7 +202,7 @@ class ssh (
           $default_sshd_config_subsystem_sftp = '/usr/lib/ssh/sftp-server'
       }
         default: {
-          fail("ssh supports architectures x86_64 and i386 for Suse. Detected architecture is <${::architecture}>.")
+          fail("ssh supports architectures x86_64 and i386 for Suse. Detected architecture is <${facts['os']['architecture']}>.")
         }
       }
     }
