@@ -1203,7 +1203,7 @@ class ssh (
 
   # export each node's ssh key
   if $ssh_key_export {
-    @@sshkey { $::fqdn :
+    @@sshkey { $facts['networking']['fqdn'] :
       ensure       => $ssh_key_ensure,
       host_aliases => $host_aliases,
       type         => $ssh_key_type,
