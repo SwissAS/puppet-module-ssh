@@ -433,7 +433,7 @@ class ssh (
       $default_sshd_config_tcp_keepalive       = undef
       $default_sshd_config_permittunnel        = undef
       $default_sshd_config_include             = undef
-      case $::kernelrelease {
+      case $facts['kernelrelease'] {
         '5.11': {
           $default_packages                      = ['network/ssh',
                                                     'network/ssh/ssh-key',
