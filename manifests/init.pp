@@ -128,7 +128,7 @@ class ssh (
   $sshd_config_include                        = 'USE_DEFAULTS',
 ) {
 
-  case $::osfamily {
+  case $facts['os']['family'] {
     'RedHat': {
       $default_packages                        = ['openssh-server',
                                                   'openssh-clients']
@@ -149,7 +149,7 @@ class ssh (
       $default_sshd_gssapicleanupcredentials   = 'yes'
       $default_sshd_acceptenv                  = true
       $default_service_hasstatus               = true
-      if versioncmp($::operatingsystemrelease, '7.4') < 0 {
+      if versioncmp($facts['os']['release']['full'], '7.4') < 0 {
         $default_sshd_config_serverkeybits = '1024'
       } else {
         $default_sshd_config_serverkeybits = undef
@@ -183,10 +183,10 @@ class ssh (
       $default_sshd_config_tcp_keepalive       = 'yes'
       $default_sshd_config_permittunnel        = 'no'
       $default_sshd_config_include             = undef
-      case $::architecture {
+      case $facts['os']['architecture'] {
         'x86_64': {
-          if ($::operatingsystem == 'SLES') {
-            case $::operatingsystemrelease {
+          if ($facts['os']['name'] == 'SLES') {
+            case $facts['os']['release']['full'] {
               /15\./: {
                 $default_sshd_config_subsystem_sftp = '/usr/lib/ssh/sftp-server'
                 $default_sshd_config_serverkeybits  = undef
@@ -202,7 +202,7 @@ class ssh (
           $default_sshd_config_subsystem_sftp = '/usr/lib/ssh/sftp-server'
       }
         default: {
-          fail("ssh supports architectures x86_64 and i386 for Suse. Detected architecture is <${::architecture}>.")
+          fail("ssh supports architectures x86_64 and i386 for Suse. Detected architecture is <${facts['os']['architecture']}>.")
         }
       }
     }
@@ -212,7 +212,7 @@ class ssh (
                                                   'openssh-client']
       $default_service_name                    = 'ssh'
 
-      case $::operatingsystemrelease {
+      case $facts['os']['release']['full'] {
         '16.04': {
           $default_sshd_config_hostkey = [
             '/etc/ssh/ssh_host_rsa_key',
@@ -409,7 +409,7 @@ class ssh (
           $default_service_hasstatus               = true
           $default_sshd_config_include             = undef
         }
-        default: { fail ("Operating System : ${::operatingsystemrelease} not supported") }
+        default: { fail ("Operating System : ${facts['os']['release']['full']} not supported") }
       }
     }
     'Solaris': {
@@ -433,7 +433,7 @@ class ssh (
       $default_sshd_config_tcp_keepalive       = undef
       $default_sshd_config_permittunnel        = undef
       $default_sshd_config_include             = undef
-      case $::kernelrelease {
+      case $facts['kernelrelease'] {
         '5.11': {
           $default_packages                      = ['network/ssh',
                                                     'network/ssh/ssh-key',
@@ -468,7 +468,7 @@ class ssh (
       }
     }
     default: {
-      fail("ssh supports osfamilies RedHat, Suse, Debian and Solaris. Detected osfamily is <${::osfamily}>.")
+      fail("ssh supports osfamilies RedHat, Suse, Debian and Solaris. Detected osfamily is <${facts['os']['family']}>.")
     }
   }
 
@@ -524,7 +524,9 @@ class ssh (
   }
 
   if $sshd_config_xauth_location_real != undef {
-    validate_absolute_path($sshd_config_xauth_location_real)
+    if !($sshd_config_xauth_location_real =~ Stdlib::Compat::Absolute_path) {
+      fail("Expected an absolute path, got '${sshd_config_xauth_location_real}'")
+    }
   }
 
   if $ssh_package_source == 'USE_DEFAULTS' {
@@ -534,7 +536,9 @@ class ssh (
   }
 
   if $ssh_package_source_real != undef {
-    validate_absolute_path($ssh_package_source_real)
+    if !($ssh_package_source_real =~ Stdlib::Compat::Absolute_path) {
+      fail("Expected an absolute path, got '${ssh_package_source_real}'")
+    }
   }
 
   if $ssh_package_adminfile == 'USE_DEFAULTS' {
@@ -544,7 +548,9 @@ class ssh (
   }
 
   if $ssh_package_adminfile_real != undef {
-    validate_absolute_path($ssh_package_adminfile_real)
+    if !($ssh_package_adminfile_real =~ Stdlib::Compat::Absolute_path) {
+      fail("Expected an absolute path, got '${ssh_package_adminfile_real}'")
+    }
   }
 
   if $sshd_config_use_dns == 'USE_DEFAULTS' {
@@ -653,7 +659,9 @@ class ssh (
     $sshd_config_hostkey_real = $default_sshd_config_hostkey
   } else {
     validate_array($sshd_config_hostkey)
-    validate_absolute_path($sshd_config_hostkey)
+    if !($sshd_config_hostkey =~ Stdlib::Compat::Absolute_path) {
+      fail("Expected an absolute path, got '${sshd_config_hostkey}'")
+    }
     $sshd_config_hostkey_real = $sshd_config_hostkey
   }
 
@@ -814,7 +822,9 @@ class ssh (
   if is_integer($sshd_client_alive_count_max) == false { fail("ssh::sshd_client_alive_count_max must be an integer and is set to <${sshd_client_alive_count_max}>.") }
 
   if $sshd_config_banner != 'none' {
-    validate_absolute_path($sshd_config_banner)
+    if !($sshd_config_banner =~ Stdlib::Compat::Absolute_path) {
+      fail("Expected an absolute path, got '${sshd_config_banner}'")
+    }
   }
   if $sshd_banner_content != undef and $sshd_config_banner == 'none' {
     fail('ssh::sshd_config_banner must be set to be able to use sshd_banner_content.')
@@ -868,7 +878,9 @@ class ssh (
   }
 
   if $sshd_config_chrootdirectory != undef {
-    validate_absolute_path($sshd_config_chrootdirectory)
+    if !($sshd_config_chrootdirectory =~ Stdlib::Compat::Absolute_path) {
+      fail("Expected an absolute path, got '${sshd_config_chrootdirectory}'")
+    }
   }
 
   if $sshd_config_forcecommand != undef {
@@ -876,7 +888,9 @@ class ssh (
   }
 
   if $sshd_authorized_keys_command != undef {
-    validate_absolute_path($sshd_authorized_keys_command)
+    if !($sshd_authorized_keys_command =~ Stdlib::Compat::Absolute_path) {
+      fail("Expected an absolute path, got '${sshd_authorized_keys_command}'")
+    }
   }
 
   if $sshd_authorized_keys_command_user != undef {
@@ -973,12 +987,16 @@ class ssh (
     }
   }
 
-  validate_absolute_path($ssh_config_global_known_hosts_file)
+  if !($ssh_config_global_known_hosts_file =~ Stdlib::Compat::Absolute_path) {
+    fail("Expected an absolute path, got '${ssh_config_global_known_hosts_file}'")
+  }
   $ssh_config_global_known_hosts_file_real = any2array($ssh_config_global_known_hosts_file)
 
   if $ssh_config_global_known_hosts_list != undef {
     validate_array($ssh_config_global_known_hosts_list)
-    validate_absolute_path($ssh_config_global_known_hosts_list)
+    if !($ssh_config_global_known_hosts_list =~ Stdlib::Compat::Absolute_path) {
+      fail("Expected an absolute path, got '${ssh_config_global_known_hosts_list}'")
+    }
     $ssh_config_global_known_hosts_list_real = concat($ssh_config_global_known_hosts_file_real, $ssh_config_global_known_hosts_list)
   } else {
     $ssh_config_global_known_hosts_list_real = $ssh_config_global_known_hosts_file_real
@@ -1087,19 +1105,25 @@ class ssh (
     if is_array($sshd_config_hostcertificate_real) {
       validate_array($sshd_config_hostcertificate_real)
     }
-    validate_absolute_path($sshd_config_hostcertificate_real)
+    if !($sshd_config_hostcertificate_real =~ Stdlib::Compat::Absolute_path) {
+      fail("Expected an absolute path, got '${sshd_config_hostcertificate_real}'")
+    }
   }
 
   if $sshd_config_trustedusercakeys_real != undef {
     # TrustedUserCAKeys may be a path to the keys or 'none'
     if $sshd_config_trustedusercakeys_real != 'none' {
-      validate_absolute_path($sshd_config_trustedusercakeys_real)
+      if !($sshd_config_trustedusercakeys_real =~ Stdlib::Compat::Absolute_path) {
+        fail("Expected an absolute path, got '${sshd_config_trustedusercakeys_real}'")
+      }
     }
   }
   if $sshd_config_key_revocation_list_real != undef {
     # RevokedKeys may be a path to the key revocation list or 'none'
     if $sshd_config_key_revocation_list_real != 'none' {
-      validate_absolute_path($sshd_config_key_revocation_list)
+      if !($sshd_config_key_revocation_list =~ Stdlib::Compat::Absolute_path) {
+        fail("Expected an absolute path, got '${sshd_config_key_revocation_list}'")
+      }
     }
   }
 
@@ -1194,16 +1218,16 @@ class ssh (
   }
 
   # If either IPv4 or IPv6 stack is not configured on the agent, the
-  # corresponding $::ipaddress(6)? fact is not present. So, we cannot assume
+  # corresponding $facts['networking']['ip'](6)? fact is not present. So, we cannot assume
   # these variables are defined. Getvar (Stdlib 4.13+, ruby 1.8.7+) handles
   # this correctly.
-  if getvar('::ipaddress') and getvar('::ipaddress6') { $host_aliases = [$::hostname, $::ipaddress, $::ipaddress6] }
-  elsif getvar('::ipaddress6') { $host_aliases = [$::hostname, $::ipaddress6] }
-  else { $host_aliases = [$::hostname, $::ipaddress] }
+  if getvar('::ipaddress') and getvar('::ipaddress6') { $host_aliases = [$facts['networking']['hostname'], $facts['networking']['ip'], $facts['networking']['ip6']] }
+  elsif getvar('::ipaddress6') { $host_aliases = [$facts['networking']['hostname'], $facts['networking']['ip6']] }
+  else { $host_aliases = [$facts['networking']['hostname'], $facts['networking']['ip']] }
 
   # export each node's ssh key
   if $ssh_key_export {
-    @@sshkey { $::fqdn :
+    @@sshkey { $facts['networking']['fqdn'] :
       ensure       => $ssh_key_ensure,
       host_aliases => $host_aliases,
       type         => $ssh_key_type,
@@ -1248,7 +1272,7 @@ class ssh (
   }
 
   if $sshd_addressfamily_real != undef {
-    if $::osfamily == 'Solaris' {
+    if $facts['os']['family'] == 'Solaris' {
       fail("ssh::sshd_addressfamily is not supported on Solaris and is set to <${sshd_addressfamily}>.")
     } else {
       validate_re($sshd_addressfamily_real, '^(any|inet|inet6)$',
